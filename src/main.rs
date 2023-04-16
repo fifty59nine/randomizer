@@ -6,7 +6,7 @@ mod random;
 const BAD_SYMBOL: &str = "O";
 const ULTRA_SYMBOL: &str = "$";
 const BET: i32 = 10;
-const BANK: i32 = 50;
+const BANK: i32 = 10000;
 
 fn main() {
     start_casino();
@@ -22,12 +22,21 @@ fn start_casino() {
     r.add(ULTRA_SYMBOL, 20.);
 
     let mut bank = BANK;
+    let mut bet: i32 = BET;
 
     loop {
-        print!("$ Click to spin (Bank: ${}) $", bank);
-        bank -= BET;
+        let mut bet_str = String::new();
+        println!("$ Casino777 (Bank: ${}) $", bank);
+        print!("Enter bet (or enter for {}) >>> ", bet);
         std::io::stdout().flush().unwrap();
-        let _ = std::io::stdin().read_line(&mut String::new());
+        std::io::stdin().read_line(&mut bet_str).expect("Error!");
+        bet_str = bet_str.replace('\n', "");
+        match bet_str.parse::<i32>() {
+            Ok(n) => bet = n,
+            _ => {}
+        }
+
+        bank -= bet;
         println!();
         let mut win: Vec<Vec<String>> = Vec::with_capacity(3);
         for _col in 0..3 {
@@ -44,15 +53,15 @@ fn start_casino() {
             println!();
             win.push(row_vec);
         }
-        let multi = validate_win(&win);
+        let multi = validate_win(&win, &bet);
         if multi != 0 {
-            bank += multi * BET;
+            bank += multi * bet;
         }
     }
 }
 
 #[allow(unused_assignments)]
-fn validate_win(arr: &[Vec<String>]) -> i32 {
+fn validate_win(arr: &[Vec<String>], bet: &i32) -> i32 {
     let mut win_multi: i32 = 0;
     for row in arr {
         if row.iter().all(|item| item == &row[0] && item != BAD_SYMBOL) {
@@ -90,6 +99,9 @@ fn validate_win(arr: &[Vec<String>]) -> i32 {
         };
     }
 
-    println!("\nВаш виграш X{win_multi}\n\n=============================\n");
+    println!(
+        "\nYour prize X{win_multi} (${})\n\n=============================\n",
+        bet * win_multi
+    );
     win_multi
 }
