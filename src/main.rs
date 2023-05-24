@@ -1,7 +1,6 @@
 use std::io::Write;
 
-use crate::random::Randomizer;
-mod random;
+use randomizer::Randomizer;
 
 const BAD_SYMBOL: &str = "O";
 const ULTRA_SYMBOL: &str = "$";
